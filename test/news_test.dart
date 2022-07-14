@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
+
 import 'package:test_driven_app/src/article.dart';
 import 'package:test_driven_app/src/news_change_notifier.dart';
 import 'package:test_driven_app/src/news_service.dart';
@@ -38,7 +39,42 @@ void main() {
 
   test("initial values are correct", () {
     expect(sut.articles, []);
-    expectLater(sut.isLoading, false);
+    expect(sut.isLoading, false);
+  });
+
+  group('getArticles', () {
+    final articlesFromService = [
+      Article(title: 'Test1', content: 'Test 1 content'),
+      Article(title: 'Test2', content: 'Test 2 content'),
+      Article(title: 'Test3', content: 'Test 3 content'),
+    ];
+    void arrangeNewsServiceReturns() {
+      when(() => mockNewsService.getArticles())
+          .thenAnswer((_) async => articlesFromService);
+    }
+
+    test(
+      "gets articles using the NewsService",
+      () async {
+        //when(() => mockNewsService.getArticles()).thenAnswer((_) async => []);
+        arrangeNewsServiceReturns();
+        await sut.getArticles();
+        verify(() => mockNewsService.getArticles()).called(1);
+        //
+      },
+    );
+    test(
+      """indicaets loading of data,
+    sets articles to the ones from the service,
+    indicates that data is not being loaded anymore""",
+      () async {
+        arrangeNewsServiceReturns();
+        final future = sut.getArticles();
+        expect(sut.isLoading, true);
+        await future;
+        expect(sut.articles, articlesFromService);
+        expect(sut.isLoading, false);
+      },
+    );
   });
 }
-
