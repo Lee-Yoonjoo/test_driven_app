@@ -98,9 +98,10 @@ void main() {
       await tester.pump();
       await tester.tap(find.text("Test 1 content"));
       await tester.pumpAndSettle();
-      expect(find.byType(NewsPage), findsNothing);expect(find.byType(ArticlePage), findsOneWidget);
-
-
+      expect(find.byType(NewsPage), findsNothing);
+      expect(find.byType(ArticlePage), findsOneWidget);
+      expect(find.text('Test1'), findsOneWidget);
+      expect(find.text('Test 1 content'), findsOneWidget);
     },
   );
 }
